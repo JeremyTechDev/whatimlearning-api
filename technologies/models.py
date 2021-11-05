@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models.deletion import CASCADE
 
 
 class FeaturedCode(models.Model):
@@ -30,7 +29,7 @@ class FeaturedCode(models.Model):
 
 
 class Technology(models.Model):
-    name = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
     description = models.TextField(max_length=1000, null=True)
     cover_img = models.URLField(null=True)
     last_update = models.DateTimeField(auto_now=True)
@@ -44,7 +43,7 @@ class Technology(models.Model):
         verbose_name_plural = 'Technologies'
 
     def __str__(self) -> str:
-        return self.name
+        return self.title
 
 
 class Resource(models.Model):
@@ -52,7 +51,7 @@ class Resource(models.Model):
     description = models.TextField(max_length=1000, null=True)
     url = models.URLField()
     is_free = models.BooleanField(default=True)
-    technologies = models.ForeignKey(Technology, on_delete=CASCADE)
+    technology = models.ForeignKey(Technology, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return self.title
