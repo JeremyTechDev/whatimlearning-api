@@ -5,10 +5,6 @@ from django.urls import reverse
 from . import models
 
 
-class FeaturedCodeItemInline(admin.StackedInline):
-    model = models.FeaturedCode
-
-
 class ResourceItemInline(admin.StackedInline):
     model = models.Resource
     extra = 0
@@ -19,7 +15,7 @@ class TechnologyAdmin(admin.ModelAdmin):
     list_display = ['title', 'description', 'resources_count', 'last_update']
     search_fields = ['title__istartswith']
     list_prefetch_related = ['resources']
-    inlines = [FeaturedCodeItemInline, ResourceItemInline]
+    inlines = [ResourceItemInline]
 
     @admin.display(ordering='resources_count')
     def resources_count(self, technology):

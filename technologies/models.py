@@ -35,7 +35,8 @@ class Technology(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     featured_code = models.OneToOneField(
         FeaturedCode,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
     )
 
     class Meta:
