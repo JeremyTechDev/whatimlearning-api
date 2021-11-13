@@ -1,12 +1,24 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework_nested import routers
 
 from . import views
 
+router = routers.SimpleRouter()
+router.register('technologies', views.TechnologyViewSet)
+
+technologies_router = routers.NestedSimpleRouter(
+    router,
+    'technologies',
+    lookup='technology'  # will include technology_pk in kwargs
+)
+technologies_router.register(
+    'resources',
+    views.ResourceViewSet,
+    basename='technology-resources'
+)
+
+
 urlpatterns = [
-    path('health/', views.health_check),
-    path('technologies/', views.technologies_list),
-    path('technologies/<int:id>/', views.technology_details),
-    path('technologies/<int:id>/resources', views.technology_resources),
-    path('resources/', views.resources_list),
-    path('resources/<int:id>/', views.resource_details),
+    path('', include(router.urls)),
+    path('', include(technologies_router.urls)),
 ]

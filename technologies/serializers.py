@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from . import models
-import technologies
 
 
 class FeaturedCodeSerializer(serializers.ModelSerializer):
@@ -11,7 +10,7 @@ class FeaturedCodeSerializer(serializers.ModelSerializer):
 
 class TechnologySerializer(serializers.ModelSerializer):
     featured_code = FeaturedCodeSerializer(required=False)
-    resource_count = serializers.IntegerField()
+    resource_count = serializers.IntegerField(read_only=True)
 
     def create(self, validated_data):
         if validated_data.get('featured_code', None):
@@ -51,5 +50,8 @@ class ResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'title', 'description',
-                  'url', 'is_free', 'technology']
+        fields = ['id', 'title', 'description', 'url', 'is_free']
+
+    def create(self, validated_data):
+        technology_id = self.context['technology_pk']
+        return models.Resource.objects.create(technology_id=technology_id, **validated_data)
