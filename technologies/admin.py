@@ -10,12 +10,17 @@ class ResourceItemInline(admin.StackedInline):
     extra = 0
 
 
+class FeaturedCodeItemInline(admin.StackedInline):
+    model = models.FeaturedCode
+
+
 @admin.register(models.Technology)
 class TechnologyAdmin(admin.ModelAdmin):
-    list_display = ['title', 'description', 'resources_count', 'last_update']
+    list_display = ['title', 'description',
+                    'resources_count', 'featured_code', 'last_update']
     search_fields = ['title__istartswith']
     list_prefetch_related = ['resources']
-    inlines = [ResourceItemInline]
+    inlines = [FeaturedCodeItemInline, ResourceItemInline]
 
     @admin.display(ordering='resources_count')
     def resources_count(self, technology):
@@ -25,8 +30,8 @@ class TechnologyAdmin(admin.ModelAdmin):
         return format_html('<a href="{}">{}</a>', url, technology.resources_count)
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(
-            resources_count=Count('resource')
+        return super().get_queryset(request).select_related('featured_code').annotate(
+            resources_count=Count('resources')
         )
 
 

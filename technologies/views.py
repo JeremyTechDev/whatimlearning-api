@@ -10,7 +10,7 @@ from technologies.serializers import ResourceSerializer, TechnologySerializer
 class TechnologyViewSet(ModelViewSet):
     queryset = models.Technology.objects.select_related(
         'featured_code'
-    ).annotate(resource_count=Count('resource')).all()
+    ).annotate(resource_count=Count('resources')).all()
     serializer_class = TechnologySerializer
 
 

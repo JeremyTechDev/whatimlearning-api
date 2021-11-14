@@ -42,8 +42,8 @@ class TechnologySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Technology
-        fields = ['id', 'title', 'featured_code',
-                  'description', 'cover_img', 'last_update', 'resource_count']
+        fields = ['id', 'title', 'description',
+                  'cover_img', 'last_update', 'resource_count']
 
 
 class ResourceSerializer(serializers.ModelSerializer):
