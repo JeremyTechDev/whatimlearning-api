@@ -17,11 +17,11 @@ import debug_toolbar
 from django.contrib import admin
 from django.urls import include, path
 
-admin.site.site_header = 'whatimlearning'
+admin.site.site_header = 'WhatImLearning'
 admin.site.index_title = 'Admin'
 
 urlpatterns = [
-    path('', include('technologies.urls')),
+    path('', include('core.urls')),
     path('admin/', admin.site.urls),
     path('__debug__/', include(debug_toolbar.urls))
 ]
