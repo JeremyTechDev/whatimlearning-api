@@ -21,8 +21,6 @@ class Technology(models.Model):
 
 
 class Resource(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField(max_length=1000, null=True)
     url = models.URLField()
     is_free = models.BooleanField(default=True)
     technology = models.ForeignKey(
@@ -32,7 +30,7 @@ class Resource(models.Model):
     )
 
     def __str__(self) -> str:
-        return self.title
+        return self.url
 
 
 class FeaturedCode(models.Model):

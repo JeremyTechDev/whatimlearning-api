@@ -57,10 +57,9 @@ class TechnologyAdmin(admin.ModelAdmin):
 
 @admin.register(models.Resource)
 class ResourceAdmin(admin.ModelAdmin):
-    list_display = ['title', 'attached_to', 'url']
+    list_display = ['url', 'attached_to']
     list_filter = ['is_free']
     list_select_related = ['technology']
-    search_fields = ['title__istartswith']
 
     @admin.display(ordering='attached_to')
     def attached_to(self, resource):

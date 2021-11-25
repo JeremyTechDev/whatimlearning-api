@@ -12,6 +12,7 @@ djangorestframework = "*"
 drf-nested-routers = "*"
 requests = "*"
 requests-oauthlib = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

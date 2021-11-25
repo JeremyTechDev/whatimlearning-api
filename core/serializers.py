@@ -60,7 +60,7 @@ class ResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'title', 'description', 'url', 'is_free']
+        fields = ['id', 'url', 'is_free']
 
     def create(self, validated_data):
         technology_id = self.context['technology_pk']
