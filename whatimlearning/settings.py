@@ -23,17 +23,20 @@ environ.Env.read_env()
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-e0xcvg!#86ss%ev5z8d)0z87!ql1=q$_q3m*cp-&huiwgxv)@&'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS=['*']
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,10 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'debug_toolbar',
-    'technologies',
+    'core',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -75,7 +79,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'whatimlearning.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -143,6 +146,14 @@ INTERNAL_IPS = [
 ]
 
 REST_FRAMEWORK = {
-    'PAGE_SIZE': 10,   
+    'PAGE_SIZE': 10,
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
+
+AUTH_USER_MODEL = 'core.User'
+
+# Twitter env vars
+TWITTER_API_KEY = env('TWITTER_API_KEY')
+TWITTER_API_SECRET_KEY = env('TWITTER_API_SECRET_KEY')
+TWITTER_AUTH_CALLBACK_URL = env('TWITTER_AUTH_CALLBACK_URL')
+TWITTER_AUTH_URL = env('TWITTER_AUTH_URL')

@@ -1,4 +1,9 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+
+class User(AbstractUser):
+    twitter_id = models.PositiveBigIntegerField(unique=True, null=True)
 
 
 class Technology(models.Model):
@@ -6,6 +11,7 @@ class Technology(models.Model):
     description = models.TextField(max_length=1000, null=True)
     cover_img = models.URLField(null=True)
     last_update = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='technologies')
 
     class Meta:
         verbose_name_plural = 'Technologies'
@@ -15,8 +21,6 @@ class Technology(models.Model):
 
 
 class Resource(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField(max_length=1000, null=True)
     url = models.URLField()
     is_free = models.BooleanField(default=True)
     technology = models.ForeignKey(
@@ -26,7 +30,7 @@ class Resource(models.Model):
     )
 
     def __str__(self) -> str:
-        return self.title
+        return self.url
 
 
 class FeaturedCode(models.Model):

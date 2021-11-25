@@ -10,6 +10,9 @@ psycopg2 = "*"
 django-debug-toolbar = "*"
 djangorestframework = "*"
 drf-nested-routers = "*"
+requests = "*"
+requests-oauthlib = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 
