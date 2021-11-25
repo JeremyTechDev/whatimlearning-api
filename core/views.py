@@ -1,4 +1,3 @@
-from django.db.models.aggregates import Count
 from django.http.response import HttpResponseRedirect
 from django.conf import settings
 from rest_framework import status
@@ -6,6 +5,11 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from requests_oauthlib import OAuth1
+
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated, AllowAny, SAFE_METHODS
+from .permissions import IsSelf
+
 from urllib.parse import urlencode
 import requests
 
@@ -22,6 +26,11 @@ class UserViewSet(ModelViewSet):
 class TechnologyViewSet(ModelViewSet):
     serializer_class = TechnologySerializer
 
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS: 
+            return [AllowAny()]
+        return [IsAuthenticated(), IsSelf()]
+
     def get_queryset(self):
         return models.Technology.objects.select_related(
             'featured_code'
@@ -33,6 +42,11 @@ class TechnologyViewSet(ModelViewSet):
 
 class ResourceViewSet(ModelViewSet):
     serializer_class = ResourceSerializer
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAuthenticated(), IsSelf()]
 
     def get_queryset(self):
         return models.Resource.objects.filter(technology=self.kwargs['technology_pk'])
@@ -107,7 +121,9 @@ class TwitterCallbackEndpoint(APIView):
                 'twitter_id': auth_data['user_id'],
             }
             [user, created] = models.User.objects.get_or_create(**user_data)
-            user_data.update({ 'id': user.id, 'created': created })
+            [token, is_new_token] = Token.objects.get_or_create(user=user)
+            user_data.update(
+                {'id': user.id, 'auth_token': token.key, 'created': created})
 
             return Response(user_data, status=status.HTTP_200_OK)
         except:

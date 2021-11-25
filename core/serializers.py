@@ -17,7 +17,7 @@ class TechnologySerializer(serializers.ModelSerializer):
 
         if validated_data.get('featured_code'):
             featured_code = validated_data.pop('featured_code')
-            technology = models.Technology(user=user_id**validated_data)
+            technology = models.Technology(user=user_id, **validated_data)
             featured_code = models.FeaturedCode(
                 technology_id=technology.id,
                 **featured_code,
