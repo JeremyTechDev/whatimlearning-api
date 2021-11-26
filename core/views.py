@@ -1,17 +1,16 @@
-from django.http.response import HttpResponseRedirect
 from django.conf import settings
 from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.views import APIView
-from requests_oauthlib import OAuth1
-
 from rest_framework.authtoken.models import Token
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny, SAFE_METHODS
-from .permissions import IsSelf
-
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
+from requests_oauthlib import OAuth1
 from urllib.parse import urlencode
 import requests
+
+from .permissions import IsSelf
 
 
 from . import models
@@ -23,11 +22,16 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
 
 
+class TechnologyListViewSet(ListAPIView):
+    queryset = models.Technology.objects.select_related('featured_code').all()
+    serializer_class = TechnologySerializer
+
+
 class TechnologyViewSet(ModelViewSet):
     serializer_class = TechnologySerializer
 
     def get_permissions(self):
-        if self.request.method in SAFE_METHODS: 
+        if self.request.method in SAFE_METHODS:
             return [AllowAny()]
         return [IsAuthenticated(), IsSelf()]
 
@@ -79,13 +83,14 @@ class TwitterAuthRedirectEndpoint(APIView):
                 auth=oauth,
                 data=data,
             )
-            response.raise_for_status()
+            print(response.status_code)
+            # response.raise_for_status()
 
             response_split = response.text.split("&")[0]
             oauth_token = response_split.split("=")[1]
 
             # use token to authenticate with twitter
-            return HttpResponseRedirect(f"{settings.TWITTER_AUTH_URL}/authenticate?oauth_token={oauth_token}")
+            return Response({'redirect_to': f"{settings.TWITTER_AUTH_URL}/authenticate?oauth_token={oauth_token}"})
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -108,7 +113,9 @@ class TwitterCallbackEndpoint(APIView):
                 f"{settings.TWITTER_AUTH_URL}/access_token",
                 auth=oauth
             )
+            res.raise_for_status()
 
+            # parse user data into dictionary
             splitted_res = res.text.split('&')
             auth_data = dict()
             [
@@ -120,10 +127,26 @@ class TwitterCallbackEndpoint(APIView):
                 'username': auth_data['screen_name'],
                 'twitter_id': auth_data['user_id'],
             }
+
+            # get user profile
+            profile = requests.get(
+                f"{settings.TWITTER_PROFILE_URL}?screen_name={user_data['username']}",
+                None,
+                {'Authorization': f"Bearer {settings.TWITTER_BEARER}"}
+            )
+
+            user_data.update(
+                {'profile': profile.json() if profile.status_code == 200 else None}
+            )
+
             [user, created] = models.User.objects.get_or_create(**user_data)
             [token, is_new_token] = Token.objects.get_or_create(user=user)
             user_data.update(
-                {'id': user.id, 'auth_token': token.key, 'created': created})
+                {
+                    'id': user.id,
+                    'auth_token': token.key,
+                    'created': created
+                })
 
             return Response(user_data, status=status.HTTP_200_OK)
         except:

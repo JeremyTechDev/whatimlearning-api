@@ -10,7 +10,7 @@ router.register('users', views.UserViewSet)
 user_router = routers.NestedSimpleRouter(
     router,
     'users',
-    lookup='user', # will be included in kwargs as user_pk
+    lookup='user',  # will be included in kwargs as user_pk
 )
 user_router.register(
     'technologies',
@@ -33,6 +33,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('', include(user_router.urls)),
     path('', include(technologies_router.urls)),
+    path('technologies/', views.TechnologyListViewSet.as_view()),
     path(
         "auth/twitter/",
         views.TwitterAuthRedirectEndpoint.as_view(),
