@@ -2,6 +2,7 @@ from django.urls import include, path
 from rest_framework_nested import routers
 
 from . import views
+from . import auth as auth_views
 
 
 router = routers.SimpleRouter()
@@ -36,12 +37,12 @@ urlpatterns = [
     path('technologies/', views.TechnologyListViewSet.as_view()),
     path(
         "auth/twitter/",
-        views.TwitterAuthRedirectEndpoint.as_view(),
+        auth_views.TwitterAuthRedirectEndpoint.as_view(),
         name="twitter-login",
     ),
     path(
         "auth/twitter/callback/",
-        views.TwitterCallbackEndpoint.as_view(),
+        auth_views.TwitterCallbackEndpoint.as_view(),
         name="twitter-login-callback",
     ),
 ]

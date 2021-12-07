@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework import validators
 from . import models
 
 
@@ -70,9 +69,8 @@ class ResourceSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ['id', 'username', 'twitter_id']
+        fields = ['id', 'twitter_name', 'username', 'twitter_id',
+                  'profile_image', 'profile_background']
 
     def create(self, validated_data):
         return models.User.objects.get_or_create(**validated_data)
-
-
