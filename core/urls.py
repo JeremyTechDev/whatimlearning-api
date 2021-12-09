@@ -6,7 +6,7 @@ from . import auth as auth_views
 
 
 router = routers.SimpleRouter()
-router.register('users', views.UserViewSet)
+router.register('users', views.UserViewSet, basename='user')
 
 user_router = routers.NestedSimpleRouter(
     router,
@@ -34,6 +34,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('', include(user_router.urls)),
     path('', include(technologies_router.urls)),
+    path('user/<username>/', views.UserByUsernameViewSet.as_view()),
     path('technologies/', views.TechnologyListViewSet.as_view()),
     path(
         "auth/twitter/",

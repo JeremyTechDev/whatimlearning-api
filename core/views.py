@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -10,9 +10,28 @@ from .permissions import IsSelf
 from .serializers import UserSerializer, ResourceSerializer, TechnologySerializer
 
 
-class UserViewSet(ModelViewSet):
-    queryset = models.User.objects.all()
+class UserByUsernameViewSet(RetrieveAPIView):
     serializer_class = UserSerializer
+    lookup_field = 'username'
+
+    def get_queryset(self):
+        return models.User.objects.filter(username=self.kwargs['username'])
+
+class UserViewSet(ModelViewSet):
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned user by
+        filtering against a `q` query parameter in the URL.
+        """
+        queryset = models.User.objects.order_by('followers', 'username').all()
+        query = self.request.query_params.get('q')
+        if query is not None:
+            queryset = queryset.filter(username__icontains=query)
+
+        return queryset
+
 
 
 class TechnologyListViewSet(ListAPIView):

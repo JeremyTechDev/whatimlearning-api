@@ -99,7 +99,7 @@ class TwitterCallbackEndpoint(APIView):
             # if authentication is accepted, get verifier to request user data
             oauth_token = request.query_params.get("oauth_token")
             oauth_verifier = request.query_params.get("oauth_verifier")
-            print(oauth_token, oauth_verifier)
+
             oauth = OAuth1(
                 client_key=settings.TWITTER_API_KEY,
                 client_secret=settings.TWITTER_API_SECRET_KEY,
@@ -119,8 +119,7 @@ class TwitterCallbackEndpoint(APIView):
             user_profile = get_user_twitter_profile(user_data.get('username'))
             user_data.update(user_profile)
 
-            print(user_data)
-            [user, created] = models.User.objects.get_or_create(
+            [user, created] = models.User.objects.update_or_create(
                 **use_get_or_create(user_data)
             )
             [token, _] = Token.objects.get_or_create(user=user)
