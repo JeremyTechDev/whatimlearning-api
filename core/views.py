@@ -17,6 +17,7 @@ class UserByUsernameViewSet(RetrieveAPIView):
     def get_queryset(self):
         return models.User.objects.filter(username=self.kwargs['username'])
 
+
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
 
@@ -33,10 +34,18 @@ class UserViewSet(ModelViewSet):
         return queryset
 
 
-
 class TechnologyListViewSet(ListAPIView):
-    queryset = models.Technology.objects.select_related('featured_code').all()
     serializer_class = TechnologySerializer
+
+    def get_queryset(self):
+
+        queryset = models.Technology.objects.select_related(
+            'featured_code').prefetch_related('resources').all()
+        select_random = self.request.query_params.get('random')
+        if select_random is not None:
+            queryset = queryset.order_by('?')[0:3]
+
+        return queryset
 
 
 class TechnologyViewSet(ModelViewSet):
@@ -50,7 +59,7 @@ class TechnologyViewSet(ModelViewSet):
     def get_queryset(self):
         return models.Technology.objects.select_related(
             'featured_code'
-        ).filter(user=self.kwargs['user_pk'])
+        ).prefetch_related('resources').filter(user=self.kwargs['user_pk'])
 
     def get_serializer_context(self):
         return {'user_pk': self.kwargs['user_pk']}
