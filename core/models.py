@@ -3,7 +3,11 @@ from django.db import models
 
 
 class User(AbstractUser):
+    profile_background = models.URLField(max_length=255, null=True)
+    profile_image = models.URLField(max_length=255, null=True)
     twitter_id = models.PositiveBigIntegerField(unique=True, null=True)
+    twitter_name = models.CharField(max_length=50, null=True)
+    followers = models.PositiveIntegerField(null=True)
 
 
 class Technology(models.Model):
@@ -11,7 +15,8 @@ class Technology(models.Model):
     description = models.TextField(max_length=1000, null=True)
     cover_img = models.URLField(null=True)
     last_update = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='technologies')
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='technologies')
 
     class Meta:
         verbose_name_plural = 'Technologies'

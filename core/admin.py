@@ -18,11 +18,11 @@ class FeaturedCodeItemInline(admin.StackedInline):
 @admin.register(models.User)
 class UserAdmin(BaseUserAdmin):
     list_display = ['username', 'first_name', 'last_name',
-                    'twitter_id', 'is_staff', 'is_superuser']
+                    'twitter_id', 'is_staff', 'is_superuser', 'followers']
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2', 'first_name', 'last_name', 'twitter_id'),
+            'fields': ('username', 'password1', 'password2', 'first_name', 'last_name', 'twitter_id', 'followers'),
         }),
     )
 
