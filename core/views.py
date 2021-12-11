@@ -21,6 +21,11 @@ class UserByUsernameViewSet(RetrieveAPIView):
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
 
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAuthenticated(), IsSelf()]
+
     def get_queryset(self):
         """
         Optionally restricts the returned user by
@@ -40,7 +45,7 @@ class TechnologyListViewSet(ListAPIView):
     def get_queryset(self):
 
         queryset = models.Technology.objects.select_related(
-            'featured_code').prefetch_related('resources').all()
+            'featured_code', 'user').prefetch_related('resources').all()
         select_random = self.request.query_params.get('random')
         if select_random is not None:
             queryset = queryset.order_by('?')[0:3]
@@ -58,7 +63,7 @@ class TechnologyViewSet(ModelViewSet):
 
     def get_queryset(self):
         return models.Technology.objects.select_related(
-            'featured_code'
+            'featured_code', 'user'
         ).prefetch_related('resources').filter(user=self.kwargs['user_pk'])
 
     def get_serializer_context(self):
@@ -85,3 +90,10 @@ class ResourceViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class GetUserFromToken(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request, pk=None):
+        return Response(UserSerializer(request.user).data)

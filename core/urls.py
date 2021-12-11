@@ -36,6 +36,7 @@ urlpatterns = [
     path('', include(technologies_router.urls)),
     path('user/<username>/', views.UserByUsernameViewSet.as_view()),
     path('technologies/', views.TechnologyListViewSet.as_view()),
+    path('auth/token/', views.GetUserFromToken.as_view()),
     path(
         "auth/twitter/",
         auth_views.TwitterAuthRedirectEndpoint.as_view(),

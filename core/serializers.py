@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 from . import models
 
 
@@ -19,9 +20,20 @@ class ResourceSerializer(serializers.ModelSerializer):
         return models.Resource.objects.create(technology_id=technology_id, **validated_data)
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ['id', 'twitter_name', 'username', 'twitter_id',
+                  'profile_image', 'profile_background']
+
+    def create(self, validated_data):
+        return models.User.objects.get_or_create(**validated_data)
+
+
 class TechnologySerializer(serializers.ModelSerializer):
     featured_code = FeaturedCodeSerializer(required=False, allow_null=True)
     resources = ResourceSerializer(many=True, read_only=True)
+    user = UserSerializer(required=False, allow_null=True)
 
     def create(self, validated_data):
         user_id = self.context['user_pk']
@@ -64,14 +76,12 @@ class TechnologySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Technology
         fields = ['id', 'title', 'description', 'cover_img',
-                  'featured_code', 'last_update', 'resources']
+                  'featured_code', 'last_update', 'resources', 'user']
 
 
-class UserSerializer(serializers.ModelSerializer):
+class TokenSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     class Meta:
-        model = models.User
-        fields = ['id', 'twitter_name', 'username', 'twitter_id',
-                  'profile_image', 'profile_background']
-
-    def create(self, validated_data):
-        return models.User.objects.get_or_create(**validated_data)
+        model = Token
+        fields = ['user']
