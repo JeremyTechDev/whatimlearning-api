@@ -13,11 +13,10 @@ class ResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'url', 'is_free']
+        fields = ['id', 'url', 'is_free', 'technology']
 
     def create(self, validated_data):
-        technology_id = self.context['technology_pk']
-        return models.Resource.objects.create(technology_id=technology_id, **validated_data)
+        return models.Resource.objects.create(**validated_data)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -33,43 +32,17 @@ class UserSerializer(serializers.ModelSerializer):
 class TechnologySerializer(serializers.ModelSerializer):
     featured_code = FeaturedCodeSerializer(required=False, allow_null=True)
     resources = ResourceSerializer(many=True, read_only=True)
-    user = UserSerializer(required=False, allow_null=True)
+    user = UserSerializer(required=False, allow_null=True, read_only=True)
 
     def create(self, validated_data):
         user_id = self.context['user_pk']
-
-        if validated_data.get('featured_code'):
-            featured_code = validated_data.pop('featured_code')
-            technology = models.Technology(user=user_id, **validated_data)
-            featured_code = models.FeaturedCode(
-                technology_id=technology.id,
-                **featured_code,
-            )
-            technology.featured_code = featured_code
-            technology.save()
-            return technology
-        else:
-            technology = models.Technology(user=user_id, **validated_data)
-            technology.save()
-            return technology
+        technology = models.Technology(user_id=user_id, **validated_data)
+        technology.save()
+        return technology
 
     def update(self, instance, validated_data):
         user_id = self.context['user_pk']
-
-        if validated_data.get('featured_code'):
-            featured_code = models.FeaturedCode.objects.update_or_create(
-                technology_id=instance.id,
-                defaults={**validated_data.get('featured_code')}
-            )
-            validated_data['featured_code'] = featured_code[0]
-        else:
-            featured_code = models.FeaturedCode.objects.get(
-                technology_id=instance.id
-            )
-            featured_code.delete()
-            validated_data['featured_code'] = None
-
-        instance = models.Technology(user=user_id, **validated_data)
+        instance = models.Technology(user_id=user_id, **validated_data)
         instance.save()
         return instance
 

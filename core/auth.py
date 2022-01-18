@@ -43,7 +43,7 @@ def get_user_twitter_profile(screen_name: str) -> dict:
         return {
             'followers': profile_data.get('followers_count', 0),
             'profile_background': profile_data.get('profile_banner_url', None),
-            'profile_image': (profile_data.get('profile_image_url_https', '')).removesuffix('_normal'),
+            'profile_image': (profile_data.get('profile_image_url_https', '')).replace('_normal', ''),
             'twitter_name': profile_data.get('name', None),
         }
 

@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny, SAFE_METHODS
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 
@@ -84,9 +85,11 @@ class ResourceViewSet(ModelViewSet):
     def get_serializer_context(self):
         return {'technology_pk': self.kwargs['technology_pk']}
 
-    def post(self, request):
+    def create(self, request, user_pk, technology_pk):
         is_many = isinstance(request.data, list)
-        serializer = ResourceSerializer(data=request.data, many=is_many)
+        data = [dict(item, technology=technology_pk, is_free=item['isFree'])
+                for item in request.data] if is_many else request.data
+        serializer = ResourceSerializer(data=data, many=is_many)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)

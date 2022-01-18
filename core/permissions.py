@@ -11,5 +11,4 @@ class IsSelf(BasePermission):
         user_pk = args.get('user_pk', None)
         user_pk = args.get('pk', None) if user_pk is None else user_pk
 
-        print('Jere:', str(request.user.id), user_pk)
         return bool(str(request.user.id) == user_pk)
